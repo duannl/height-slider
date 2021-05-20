@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -138,16 +139,36 @@ class _HeightSliderState extends State<HeightSlider> {
   }
 
   Widget _drawLabels() {
-    int labelsToDisplay = widget.totalUnits ~/ 5 + 1;
+    // calculate text height bases on font
+    // https://stackoverflow.com/a/65492081
+    final text = '0';
+    final style = TextStyle(color: widget.numberLineColor ?? Theme.of(context).accentColor,
+            fontSize: labelFontSize);
+
+    final textPainter = TextPainter()
+      ..text = TextSpan(text: text, style: style)
+      ..textDirection = TextDirection.ltr
+      ..layout(minWidth: 0, maxWidth: double.infinity);
+    final lineHeight = textPainter.size.height;
+
+    // find ratio
+    var i = 5;
+    int labelsToDisplay = 0;
+    while(true) {
+      labelsToDisplay = widget.totalUnits ~/ i + 1;
+      if (labelsToDisplay * lineHeight < _drawingHeight) {
+        break;
+      }
+      i += 5;
+    }
+
+    // generate labels
     List<Widget> labels = List.generate(
       labelsToDisplay,
       (idx) {
         return Text(
-          "${widget.maxHeight - 5 * idx}",
-          style: TextStyle(
-            color: widget.numberLineColor ?? Theme.of(context).accentColor,
-            fontSize: labelFontSize,
-          ),
+          idx == labelsToDisplay - 1 ? "${widget.minHeight}" : "${widget.maxHeight - i * idx}",
+          style: style,
         );
       },
     );

@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -36,11 +36,18 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: HeightSlider(
-          height: height,
-          onChange: (val) => setState(() => height = val),
-          unit: 'cm', // optional
+      body: SafeArea(
+              child: Center(
+          child: HeightSlider(
+            minHeight: 70,
+            maxHeight: 750,
+            height: height,
+            onChange: (val) {
+              debugPrint('$val');
+              setState(() => height = val);
+            },
+            unit: 'cm', // optional
+          ),
         ),
       ),
     );
